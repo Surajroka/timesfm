@@ -9,7 +9,7 @@ from database.market_db import (
 
 def scan_market(
     interval: str = "5min",
-    outputsize: int = 20,
+    outputsize: int = 100,
 ):
     """Download and store recent market data for monitored assets."""
 
