@@ -27,3 +27,9 @@ uv.lock
 development_setup.md
 debug.log
 *.log
+
+# Adaptive Trading Agent
+trading_agent/.env
+trading_agent/.venv/
+trading_agent/__pycache__/
+trading_agent/**/*.db
