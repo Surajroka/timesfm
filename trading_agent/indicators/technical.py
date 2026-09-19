@@ -26,9 +26,12 @@ def add_ema(
 
 
 def add_vwap(df: pd.DataFrame) -> pd.DataFrame:
-    """Add a simple cumulative VWAP."""
+    """Add session VWAP that resets each trading day."""
 
     df = df.copy()
+
+    # Each calendar date becomes a separate trading session.
+    session = df["datetime"].dt.date
 
     typical_price = (
         df["high"] +
@@ -36,11 +39,19 @@ def add_vwap(df: pd.DataFrame) -> pd.DataFrame:
         df["close"]
     ) / 3
 
-    cumulative_price_volume = (
-        typical_price * df["volume"]
-    ).cumsum()
+    price_volume = typical_price * df["volume"]
 
-    cumulative_volume = df["volume"].cumsum()
+    cumulative_price_volume = (
+        price_volume
+        .groupby(session)
+        .cumsum()
+    )
+
+    cumulative_volume = (
+        df["volume"]
+        .groupby(session)
+        .cumsum()
+    )
 
     df["vwap"] = (
         cumulative_price_volume /
@@ -48,7 +59,6 @@ def add_vwap(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return df
-
 
 def add_rsi(
     df: pd.DataFrame,
@@ -118,6 +128,11 @@ def add_atr(
         adjust=False,
         min_periods=period,
     ).mean()
+
+    df[f"atr_pct_{period}"] = (
+    	df[f"atr_{period}"] /
+    	df["close"]
+    ) * 100
 
     return df
 
